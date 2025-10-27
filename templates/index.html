@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="card-title">System Status</h4>
+                    <div>
+                        {% if stats and stats.status == 'running' %}
+                            <a href="{{ url_for('stop_automation') }}" class="btn btn-danger">
+                                <i class="fas fa-stop"></i> Stop Automation
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('start_automation') }}" class="btn btn-success">
+                                <i class="fas fa-play"></i> Start Automation
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Emails Processed</h5>
+                                <h2>{{ stats.total_emails_processed if stats else 0 }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Responses Sent</h5>
+                                <h2>{{ stats.total_responses_sent if stats else 0 }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Avg Response Time</h5>
+                                <h2>{{ "%.2f"|format(stats.avg_response_time) if stats and stats.avg_response_time else 0 }}s</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card {% if stats and stats.status == 'running' %}bg-success{% else %}bg-danger{% endif %} text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Status</h5>
+                                <h2>{{ stats.status.title() if stats else 'Stopped' }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CAB Upload Section -->
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Import CAB File</h5>
+                <form id="cabUploadForm" action="{{ url_for('upload_cab') }}" method="POST" enctype="multipart/form-data">
+                    <div id="dropBox" class="border border-primary rounded p-5 text-center" style="cursor:pointer;">
+                        <p>Drag & drop your .cab file here, or click to select</p>
+                        <input type="file" id="cabfile" name="cabfile" accept=".cab" style="display:none;">
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title">Recent Activities</h5>
+                    <a href="{{ url_for('activities') }}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in activities %}
+                            <tr>
+                                <td>{{ activity.message_type }}</td>
+                                <td>{{ activity.email_from }}</td>
+                                <td>{{ activity.email_to }}</td>
+                                <td>
+                                    <span class="badge {% if activity.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ activity.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title">Recent Campaigns</h5>
+                    <a href="{{ url_for('campaigns') }}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for campaign in campaigns %}
+                            <tr>
+                                <td>{{ campaign.email }}</td>
+                                <td>{{ campaign.subject }}</td>
+                                <td>
+                                    <span class="badge {% if campaign.status == 'sent' %}bg-success{% elif campaign.status == 'failed' %}bg-danger{% else %}bg-warning{% endif %}">
+                                        {{ campaign.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateStats() {
+    $.get('/api/stats', function(data) {
+        $('#total-emails').text(data.total_emails_processed);
+        $('#total-responses').text(data.total_responses_sent);
+        $('#avg-response-time').text(data.avg_response_time.toFixed(2));
+        $('#system-status').text(data.status);
+    });
+}
+
+$(document).ready(function() {
+    setInterval(updateStats, 5000);  // Update stats every 5 seconds
+});
+
+document.getElementById('dropBox').addEventListener('click', function() {
+    document.getElementById('cabfile').click();
+});
+document.getElementById('cabfile').addEventListener('change', function() {
+    document.getElementById('cabUploadForm').submit();
+});
+document.getElementById('dropBox').addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.classList.add('bg-light');
+});
+document.getElementById('dropBox').addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.classList.remove('bg-light');
+});
+document.getElementById('dropBox').addEventListener('drop', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.classList.remove('bg-light');
+    let files = e.dataTransfer.files;
+    if (files.length > 0) {
+        document.getElementById('cabfile').files = files;
+        document.getElementById('cabUploadForm').submit();
+    }
+});
+</script>
+{% endblock %} 

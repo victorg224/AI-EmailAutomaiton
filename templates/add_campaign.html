@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Add New Campaign</h2>
+    
+    <form method="POST" class="mt-4">
+        <div class="mb-3">
+            <label for="company_name" class="form-label">Company Name</label>
+            <input type="text" class="form-control" id="company_name" name="company_name" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Target Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="target_person" class="form-label">Contact Person Name</label>
+            <input type="text" class="form-control" id="target_person" name="target_person">
+        </div>
+
+        <div class="mb-3">
+            <label for="context" class="form-label">Context/Notes</label>
+            <textarea class="form-control" id="context" name="context" rows="4"></textarea>
+            <div class="form-text">Add any specific details about the company, research notes, or customization needs.</div>
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Create Campaign</button>
+            <a href="{{ url_for('campaigns') }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- Preview Section -->
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h5>Email Preview</h5>
+        </div>
+        <div class="card-body">
+            <div id="emailPreview" class="bg-light p-3 rounded">
+                <p class="text-muted">Select a template to see preview...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('template_id').addEventListener('change', function() {
+    // Here you would typically make an AJAX call to get the template preview
+    // For now, we'll just show a placeholder
+    const templateId = this.value;
+    const previewDiv = document.getElementById('emailPreview');
+    
+    if (templateId) {
+        const companyName = document.getElementById('company_name').value || '[Company Name]';
+        const personName = document.getElementById('target_person').value || '[Contact Name]';
+        const industry = document.getElementById('industry').value || '[Industry]';
+        
+        // Update this with your actual template structure
+        previewDiv.innerHTML = `
+            <strong>To:</strong> ${personName}<br>
+            <strong>Company:</strong> ${companyName}<br>
+            <strong>Industry:</strong> ${industry}<br>
+            <br>
+            [Template content will be personalized with your company details]
+        `;
+    } else {
+        previewDiv.innerHTML = '<p class="text-muted">Select a template to see preview...</p>';
+    }
+});
+</script>
+{% endblock %} 

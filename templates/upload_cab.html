@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Upload CAB File</h2>
+    <form id="cabUploadForm" method="POST" enctype="multipart/form-data">
+        <div id="dropBox" class="border border-primary rounded p-5 text-center" style="cursor:pointer;">
+            <p>Drag & drop your .cab file here, or click to select</p>
+            <input type="file" id="cabfile" name="cabfile" accept=".cab" style="display:none;">
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Upload</button>
+    </form>
+</div>
+<script>
+document.getElementById('dropBox').addEventListener('click', function() {
+    document.getElementById('cabfile').click();
+});
+document.getElementById('cabfile').addEventListener('change', function() {
+    document.getElementById('cabUploadForm').submit();
+});
+document.getElementById('dropBox').addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.classList.add('bg-light');
+});
+document.getElementById('dropBox').addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.classList.remove('bg-light');
+});
+document.getElementById('dropBox').addEventListener('drop', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.classList.remove('bg-light');
+    let files = e.dataTransfer.files;
+    if (files.length > 0) {
+        document.getElementById('cabfile').files = files;
+        document.getElementById('cabUploadForm').submit();
+    }
+});
+</script>
+{% endblock %} 

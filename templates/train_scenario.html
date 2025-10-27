@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Train AI with New Scenarios</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Add New Training Scenario</h5>
+            
+            <form method="POST" class="mt-4">
+                <div class="mb-3">
+                    <label for="scenario_text" class="form-label">Scenario Description</label>
+                    <textarea class="form-control" id="scenario_text" name="scenario_text" rows="6" required
+                        placeholder="Paste the scenario details here (e.g., contract notice, opportunity description, etc.)"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="scenario_type" class="form-label">Scenario Type</label>
+                    <select class="form-control" id="scenario_type" name="scenario_type">
+                        <option value="expiring_contract">Expiring Contract</option>
+                        <option value="new_solicitation">New Solicitation</option>
+                        <option value="partnership_opportunity">Partnership Opportunity</option>
+                        <option value="capability_statement">Capability Statement Request</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="additional_context" class="form-label">Additional Context</label>
+                    <textarea class="form-control" id="additional_context" name="additional_context" rows="4"
+                        placeholder="Add any additional context, research, or specific requirements"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Analyze & Train</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="card">
+        <div class="card-header">
+            <h5>AI Analysis Preview</h5>
+        </div>
+        <div class="card-body">
+            <div id="analysisPreview" class="bg-light p-3 rounded">
+                <p class="text-muted">Analysis will appear here after submission...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelector('form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        input_text: document.getElementById('scenario_text').value,
+        scenario_type: document.getElementById('scenario_type').value,
+        additional_context: document.getElementById('additional_context').value
+    };
+    
+    try {
+        const response = await fetch('/analyze_scenario', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            const preview = document.getElementById('analysisPreview');
+            preview.innerHTML = `
+                <h6>Scenario Analysis:</h6>
+                <pre>${JSON.stringify(result.analysis, null, 2)}</pre>
+                
+                <h6 class="mt-3">Response Strategy:</h6>
+                <pre>${JSON.stringify(result.strategy, null, 2)}</pre>
+            `;
+            
+            // Submit the form if analysis is successful
+            this.submit();
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error analyzing scenario');
+    }
+});
+</script>
+{% endblock %} 

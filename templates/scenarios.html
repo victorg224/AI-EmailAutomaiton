@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Training Scenarios</h2>
+        <a href="{{ url_for('train_scenario') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Scenario
+        </a>
+    </div>
+
+    {% for scenario in scenarios %}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">{{ scenario.scenario_type|title }}</h5>
+            <span class="text-muted">{{ scenario.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        </div>
+        <div class="card-body">
+            <h6>Input Text:</h6>
+            <pre class="bg-light p-3 rounded">{{ scenario.input_text }}</pre>
+
+            <h6 class="mt-3">Analysis:</h6>
+            <pre class="bg-light p-3 rounded">{{ scenario.analysis|tojson(indent=2) }}</pre>
+
+            <h6 class="mt-3">Response Strategy:</h6>
+            <pre class="bg-light p-3 rounded">{{ scenario.response_strategy|tojson(indent=2) }}</pre>
+
+            {% if scenario.success_metrics %}
+            <h6 class="mt-3">Success Metrics:</h6>
+            <pre class="bg-light p-3 rounded">{{ scenario.success_metrics|tojson(indent=2) }}</pre>
+            {% endif %}
+
+            {% if scenario.learning_insights %}
+            <h6 class="mt-3">Learning Insights:</h6>
+            <pre class="bg-light p-3 rounded">{{ scenario.learning_insights|tojson(indent=2) }}</pre>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No training scenarios yet. Click "Add New Scenario" to start training the AI.
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 

@@ -1,0 +1,7 @@
+.env
+__pycache__/
+instance/
+nohup.out
+*.pyc
+.DS_Store
+.vscode/

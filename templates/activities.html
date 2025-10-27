@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Email Activities</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Type</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Response Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in activities %}
+                            <tr>
+                                <td>{{ activity.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>
+                                    <span class="badge {% if activity.message_type == 'incoming' %}bg-primary{% elif activity.message_type == 'outgoing' %}bg-info{% else %}bg-success{% endif %}">
+                                        {{ activity.message_type }}
+                                    </span>
+                                </td>
+                                <td>{{ activity.email_from }}</td>
+                                <td>{{ activity.email_to }}</td>
+                                <td>{{ activity.subject }}</td>
+                                <td>
+                                    <span class="badge {% if activity.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ activity.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if activity.response_time %}
+                                        {{ "%.2f"|format(activity.response_time) }}s
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

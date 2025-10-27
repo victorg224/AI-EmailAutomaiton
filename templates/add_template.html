@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% if template %}Edit{% else %}Add New{% endif %} Template</h2>
+    
+    <form method="POST" class="mt-4">
+        <div class="mb-3">
+            <label for="name" class="form-label">Template Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ template.name if template else '' }}" required>
+            <div class="form-text">Give your template a descriptive name</div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="2">{{ template.description if template else '' }}</textarea>
+            <div class="form-text">Brief description of when to use this template</div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="template_content" class="form-label">Template Content</label>
+            <textarea class="form-control" id="template_content" name="template_content" rows="10" required>{{ template.template_content if template else '' }}</textarea>
+            <div class="form-text">
+                Use variables like {company_name}, {industry}, {person_name}, etc.
+                The AI will replace these with appropriate content.
+            </div>
+        </div>
+        
+        <!-- Variables Guide -->
+        <div class="mb-4">
+            <h5>Available Variables</h5>
+            <div class="bg-light p-3 rounded">
+                <pre><code>{company_name} - Name of the company
+{industry} - Company's industry
+{person_name} - Contact person's name (if available)
+{company_size} - Company size (if available)
+{custom_research} - AI-generated company-specific research
+{value_prop} - AI-generated value proposition
+{pain_point} - AI-identified potential pain point</code></pre>
+            </div>
+        </div>
+        
+        <!-- Example Template -->
+        <div class="mb-4">
+            <h5>Example Template</h5>
+            <div class="bg-light p-3 rounded">
+                <pre><code>Hi {person_name},
+
+I noticed that {company_name} is making waves in the {industry} industry. {custom_research}
+
+{value_prop}
+
+Given your company's focus on {pain_point}, I believe we could help you achieve [specific goal].
+
+Would you be open to a brief call this week to discuss how we could help {company_name}?
+
+Best regards,
+[Your name]</code></pre>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Save Template</button>
+            <a href="{{ url_for('templates') }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %} 
